@@ -13,13 +13,18 @@ import (
 
 type Hospital struct {
 	sync.Mutex
-	Stream      `json:"stream"`
-	Departments map[string]Department `json:"departments"`
+	Children map[string]Department `json:"children"`
+	Stream   Stream                `json:"stream"`
 }
 
 func New() *Hospital {
 	return &Hospital{
-		Stream:      make(Stream, 0),
-		Departments: make(map[string]Department),
+		Children: make(map[string]Department),
+		Stream: Stream{
+			Label:    "hospital",
+			UnitType: "%",
+			Ratings:  make(map[string]Rating),
+			Values:   make([]Pulse, 0),
+		},
 	}
 }

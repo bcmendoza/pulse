@@ -1,26 +1,21 @@
 package model
 
-import (
-	"errors"
-	"fmt"
-)
-
 type Department struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	Stream `json:"stream"`
-
-	Patients map[string]Patient `json:"patients"`
-	Measures map[string]Measure `json:"measures"`
+	Children map[string]Patient `json:"patients"`
+	Stream   Stream             `json:"stream"`
 }
 
-func (h *Hospital) AddDepartment(d Department) error {
+func (h *Hospital) AddDepartment(label string) {
 	h.Lock()
 	defer h.Unlock()
 
-	if _, ok := h.Departments[d.ID]; !ok {
-		h.Departments[d.ID] = d
-		return nil
+	h.Children[label] = Department{
+		Children: make(map[string]Patient),
+		Stream: Stream{
+			Label:    label,
+			UnitType: "%",
+			Ratings:  make(map[string]Rating),
+			Values:   make([]Pulse, 0),
+		},
 	}
-	return errors.New(fmt.Sprintf("Department %s already exists", d.ID))
 }

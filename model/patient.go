@@ -1,26 +1,23 @@
 package model
 
-import (
-	"errors"
-	"fmt"
-)
-
 // Attrs are inconsequential patient data
 // They are added to the Patient struct in unstructured JSON
 type Attrs map[string]string
 
 type Patient struct {
-	ID     string `json:"id"`
-	Stream `json:"stream"`
-
-	Metrics map[string]float64 `json:"metrics"`
+	Children map[string]Metric `json:"children"`
+	Stream   Stream            `json:"stream"`
 	Attrs
 }
 
-func (d *Department) AddPatient(p Patient) error {
-	if _, ok := d.Patients[p.ID]; !ok {
-		d.Patients[p.ID] = p
-		return nil
+func (d *Department) AddPatient(label string) {
+	d.Children[label] = Patient{
+		Children: make(map[string]Metric),
+		Stream: Stream{
+			Label:    label,
+			UnitType: "%",
+			Ratings:  make(map[string]Rating),
+			Values:   make([]Pulse, 0),
+		},
 	}
-	return errors.New(fmt.Sprintf("Patient %s already exists", p.ID))
 }
