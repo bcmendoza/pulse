@@ -7,14 +7,14 @@ type Department struct {
 	Stream   Stream             `json:"stream"`
 }
 
-func (h *Hospital) AddDepartment(owner string) {
+func (h *Hospital) AddDepartment(name string) {
 	h.Lock()
 	defer h.Unlock()
 
-	h.Children[owner] = Department{
+	h.Children[name] = Department{
 		Children: make(map[string]Patient),
 		Stream: Stream{
-			Owner:    owner,
+			Owner:    name,
 			UnitType: "%",
 			Ratings:  make(map[string]Rating),
 			Current: Pulse{

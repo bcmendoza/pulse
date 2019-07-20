@@ -1,43 +1,57 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
+
+	"github.com/bcmendoza/pulse/model"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
 )
 
-func Handlers(logger zerolog.Logger) http.Handler {
-	r := mux.NewRouter()
+type handlersState struct {
+	hospital *model.Hospital
+	logger   zerolog.Logger
+}
 
-	r.HandleFunc("/ping", ping(logger))
+type RequestBody struct {
+	Department string `json:"department"`
+	Patient    string `json:"patient"`
+	Metric     string `json:"metric"`
+	UnitType   string `json:"unitType"`
+}
+
+func Handlers(hospital *model.Hospital, logger zerolog.Logger) http.Handler {
+	hs := handlersState{hospital, logger}
+	r := mux.NewRouter()
+	r.HandleFunc("/summary", hs.getSummary())
+	r.HandleFunc("/department", hs.addDepartment())
+	r.HandleFunc("/patient", hs.addPatient())
+	r.HandleFunc("/metric", hs.addMetric())
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/app/docs")))
 	return r
 }
 
-func ping(logger zerolog.Logger) func(http.ResponseWriter, *http.Request) {
+func (hs *handlersState) getSummary() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if logger, ok := verifyMethod("/ping", r.Method, "GET", logger, w); ok {
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			jsonResp := "{\"ping\": \"pong\"}"
-			if _, err := w.Write([]byte(jsonResp)); err != nil {
-				logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
+		if logger, ok := validateMethod("/summary", r.Method, "GET", hs.logger, w); ok {
+			jsonResp, err := json.Marshal(hs.hospital)
+			if err != nil {
+				logger.Error().AnErr("json.Marshal", err).Msg("Could not marshall response into JSON")
+				Report(ProblemDetail{
+					StatusCode: http.StatusInternalServerError,
+					Detail:     "Could not marshall response into JSON",
+				}, w)
 			} else {
-				logger.Info().Msg("200 OK")
+				w.WriteHeader(http.StatusOK)
+				w.Header().Set("Content-Type", "application/json")
+				if _, err := w.Write([]byte(jsonResp)); err != nil {
+					logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
+				} else {
+					logger.Info().Msg("200 OK")
+				}
 			}
 		}
 	}
-}
-
-func verifyMethod(route, method, expectedMethod string, logger zerolog.Logger, w http.ResponseWriter) (zerolog.Logger, bool) {
-	logger = logger.With().Str("request-type", fmt.Sprintf("%s %s", method, route)).Logger()
-	if method != expectedMethod {
-		logger.Warn().Msg("405 Method Not Allowed")
-		Report(ProblemDetail{StatusCode: http.StatusMethodNotAllowed, Detail: method}, w)
-		return logger, false
-	}
-	logger.Info().Msg("Receive request")
-	return logger, true
 }

@@ -12,11 +12,14 @@ type Patient struct {
 	Attrs
 }
 
-func (d *Department) AddPatient(owner string) {
-	d.Children[owner] = Patient{
+func (h *Hospital) AddPatient(department, patient string) {
+	h.Lock()
+	defer h.Unlock()
+
+	h.Children[department].Children[patient] = Patient{
 		Children: make(map[string]Metric),
 		Stream: Stream{
-			Owner:    owner,
+			Owner:    patient,
 			UnitType: "%",
 			Ratings:  make(map[string]Rating),
 			Current: Pulse{

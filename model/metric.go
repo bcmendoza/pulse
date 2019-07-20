@@ -9,11 +9,14 @@ type Metric struct {
 	Stream   Stream              `json:"stream"`
 }
 
-func (d *Department) AddMetric(owner, unitType string) {
-	d.Children[owner] = Patient{
+func (h *Hospital) AddMetric(department, patient, metric, unitType string) {
+	h.Lock()
+	defer h.Unlock()
+
+	h.Children[department].Children[patient].Children[metric] = Metric{
 		Children: nil,
 		Stream: Stream{
-			Owner:    owner,
+			Owner:    metric,
 			UnitType: unitType,
 			Ratings:  make(map[string]Rating),
 			Current: Pulse{

@@ -10,9 +10,10 @@ import (
 	"time"
 
 	"github.com/bcmendoza/pulse/handlers"
-	"github.com/spf13/viper"
+	"github.com/bcmendoza/pulse/model"
 
 	"github.com/rs/zerolog"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -32,11 +33,13 @@ func main() {
 	// context
 	_, cancelFunc := context.WithCancel(context.Background())
 
+	hospital := model.New()
+
 	// REST server
 	serverLogger := logger.With().Str("package", "handlers").Logger()
 	server := http.Server{
 		Addr:    fmt.Sprintf("0.0.0.0:%d", viper.GetInt("PORT")),
-		Handler: handlers.Handlers(serverLogger),
+		Handler: handlers.Handlers(hospital, serverLogger),
 	}
 	go func() {
 		serverLogger.Info().Msg("Startup REST server")
