@@ -164,7 +164,7 @@
         },
         "patient": {
           "type": "string",
-          "example": "39fd6a79-1791-4117-9d14-9a7b2118f930"
+          "example": "patient-39fd6a79-1791-4117-9d14-9a7b2118f930"
         },
         "metric": {
           "type": "string",
