@@ -4,10 +4,6 @@
 #-- Common
 #------------------------------------------------------------------------------
 
-build: vendor
-	@echo "Building binary..."
-	@go build --mod=vendor
-
 test: vendor
 	@echo "Testing..."
 	@go test --mod=vendor
@@ -21,19 +17,23 @@ vendor:
 #-- Docker
 #------------------------------------------------------------------------------
 
-docker.image: build
+build:
+	@echo "Building binary..."
+	@go build --mod=vendor
 	@echo "Generating docker image..."
 	@docker build -t bcmendoza/pulse:latest .
 
-docker.run:
+start:
 	@docker run -d --name pulse -p 8080:8080 bcmendoza/pulse:latest
 
-docker.exec:
+exec:
 	@docker exec -it pulse sh
 
-docker.stop:
+stop:
 	@docker stop pulse
 	@docker rm pulse
+
+restart: stop build start
 
 #------------------------------------------------------------------------------
 #-- push
