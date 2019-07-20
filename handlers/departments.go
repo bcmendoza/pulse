@@ -31,7 +31,7 @@ func (hs *handlersState) addDepartment() func(http.ResponseWriter, *http.Request
 				hs.hospital.AddDepartment(req.Department)
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
-				jsonResp := fmt.Sprintf("{\"created\": %s}", req.Department)
+				jsonResp := fmt.Sprintf("{\"created\": \"%s\"}", req.Department)
 				if _, err := w.Write([]byte(jsonResp)); err != nil {
 					logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
 				} else {
