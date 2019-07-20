@@ -41,5 +41,5 @@ restart: stop build start
 
 push:
 	@echo "Pushing Docker image..."
-	@heroku container:push latest -a pacific-chamber-17670
-	@heroku container:release latest
+	@heroku container:push web -a pacific-chamber-17670
+	@heroku container:release web

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -9,11 +10,17 @@ import (
 	"time"
 
 	"github.com/bcmendoza/pulse/handlers"
+	"github.com/spf13/viper"
+
 	"github.com/rs/zerolog"
 )
 
 func main() {
 	var err error
+
+	viper.AutomaticEnv()
+	viper.SetDefault("PORT", 8080)
+
 	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.Stamp}).
 		With().Timestamp().Logger()
 	logger.Info().Msg("Startup")
@@ -28,7 +35,7 @@ func main() {
 	// REST server
 	serverLogger := logger.With().Str("package", "handlers").Logger()
 	server := http.Server{
-		Addr:    "0.0.0.0:8080",
+		Addr:    fmt.Sprintf("0.0.0.0:%d", viper.GetInt("PORT")),
 		Handler: handlers.Handlers(serverLogger),
 	}
 	go func() {
