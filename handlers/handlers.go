@@ -12,7 +12,7 @@ func Handlers(logger zerolog.Logger) http.Handler {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/ping", ping(logger))
-	r.PathPrefix("/api").Handler(http.FileServer(http.Dir("/app/docs")))
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/app/docs")))
 	return r
 }
 
