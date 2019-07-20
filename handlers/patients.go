@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/bcmendoza/pulse/utils"
 )
 
 func (hs *handlersState) addPatient() func(http.ResponseWriter, *http.Request) {
@@ -11,15 +13,24 @@ func (hs *handlersState) addPatient() func(http.ResponseWriter, *http.Request) {
 		if logger, ok := validateMethod("/department", r.Method, "POST", hs.logger, w); ok {
 			req, ok := validateRequestFields(r.Body, logger, w)
 			if ok {
-				if req.Department == "" || req.Patient == "" {
+				if req.Department == "" {
 					logger.Error().AnErr("addPatient()", errors.New("missing field(s)")).Msg("400 Bad Request")
 					Report(ProblemDetail{
 						StatusCode: http.StatusBadRequest,
-						Detail:     "Department and/or patient name is empty",
+						Detail:     "Department name to add patient to is empty",
 					}, w)
+					return
 				}
 
-				hs.hospital.AddPatient(req.Department, req.Patient)
+				if _, ok := hs.hospital.Children[req.Department]; !ok {
+					logger.Error().AnErr("addPatient()", errors.New("missing field(s)")).Msg("400 Bad Request")
+					Report(ProblemDetail{
+						StatusCode: http.StatusBadRequest,
+						Detail:     "Department name to add patient to is invalid",
+					}, w)
+					return
+				}
+				hs.hospital.AddPatient(req.Department, utils.UUID())
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				jsonResp := fmt.Sprintf("{\"created\": %s}", req.Patient)

@@ -17,6 +17,7 @@ func (hs *handlersState) addDepartment() func(http.ResponseWriter, *http.Request
 						StatusCode: http.StatusBadRequest,
 						Detail:     "Department name is empty",
 					}, w)
+					return
 				}
 
 				hs.hospital.AddDepartment(req.Department)

@@ -1,15 +1,15 @@
 package model
 
-import "github.com/bcmendoza/pulse/utils"
+import (
+	"fmt"
 
-// Attrs are inconsequential patient data
-// They are added to the Patient struct in unstructured JSON
-type Attrs map[string]string
+	"github.com/bcmendoza/pulse/utils"
+)
 
 type Patient struct {
+	Name     string            `json:"name"`
 	Children map[string]Metric `json:"children"`
 	Stream   Stream            `json:"stream"`
-	Attrs
 }
 
 func (h *Hospital) AddPatient(department, patient string) {
@@ -17,6 +17,7 @@ func (h *Hospital) AddPatient(department, patient string) {
 	defer h.Unlock()
 
 	h.Children[department].Children[patient] = Patient{
+		Name:     fmt.Sprintf("patient-%s", patient),
 		Children: make(map[string]Metric),
 		Stream: Stream{
 			Owner:    patient,

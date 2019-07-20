@@ -11,15 +11,28 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 		if logger, ok := validateMethod("/department", r.Method, "POST", hs.logger, w); ok {
 			req, ok := validateRequestFields(r.Body, logger, w)
 			if ok {
-				if req.Department == "" || req.Patient == "" || req.Metric == "" || req.UnitType == "" {
+				if req.Metric == "" || req.UnitType == "" {
 					logger.Error().AnErr("addMetric()", errors.New("missing field(s)")).Msg("400 Bad Request")
 					Report(ProblemDetail{
 						StatusCode: http.StatusBadRequest,
-						Detail:     "Department, patient, metric, and/or unitType are empty",
+						Detail:     "Metric, and/or unitType are empty",
 					}, w)
 				}
 
-				hs.hospital.AddMetric(req.Department, req.Patient, req.Metric, req.UnitType)
+				if req.Patient == "" && req.Department == "" {
+					hs.hospital.AddHospitalMetrics(req.Metric, req.UnitType)
+				} else if req.Patient == "" && req.Department != "" {
+					hs.hospital.AddDepartmentMetrics(req.Department, req.Metric, req.UnitType)
+				} else if req.Patient != "" && req.Department != "" {
+					hs.hospital.AddPatientMetric(req.Department, req.Patient, req.Metric, req.UnitType)
+				} else {
+					logger.Error().AnErr("addMetric()", errors.New("missing field(s)")).Msg("400 Bad Request")
+					Report(ProblemDetail{
+						StatusCode: http.StatusBadRequest,
+						Detail:     "Patient specified but no department in metric creation",
+					}, w)
+				}
+
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				jsonResp := fmt.Sprintf("{\"created\": %s}", req.Metric)

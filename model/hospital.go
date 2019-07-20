@@ -15,12 +15,14 @@ import (
 
 type Hospital struct {
 	sync.Mutex
+	Name     string                `json:"name"`
 	Children map[string]Department `json:"children"`
 	Stream   Stream                `json:"stream"`
 }
 
 func New() *Hospital {
 	return &Hospital{
+		Name:     "hospital",
 		Children: make(map[string]Department),
 		Stream: Stream{
 			Owner:    "hospital",

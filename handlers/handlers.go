@@ -26,9 +26,9 @@ func Handlers(hospital *model.Hospital, logger zerolog.Logger) http.Handler {
 	hs := handlersState{hospital, logger}
 	r := mux.NewRouter()
 	r.HandleFunc("/summary", hs.getSummary())
-	r.HandleFunc("/department", hs.addDepartment())
-	r.HandleFunc("/patient", hs.addPatient())
-	r.HandleFunc("/metric", hs.addMetric())
+	r.HandleFunc("/departments", hs.addDepartment())
+	r.HandleFunc("/patients", hs.addPatient())
+	r.HandleFunc("/metrics", hs.addMetric())
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/app/docs")))
 	return r
 }
