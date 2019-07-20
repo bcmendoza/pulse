@@ -1,21 +1,27 @@
 package model
 
+import "github.com/bcmendoza/pulse/utils"
+
 type Department struct {
 	Children map[string]Patient `json:"patients"`
 	Stream   Stream             `json:"stream"`
 }
 
-func (h *Hospital) AddDepartment(label string) {
+func (h *Hospital) AddDepartment(owner string) {
 	h.Lock()
 	defer h.Unlock()
 
-	h.Children[label] = Department{
+	h.Children[owner] = Department{
 		Children: make(map[string]Patient),
 		Stream: Stream{
-			Label:    label,
+			Owner:    owner,
 			UnitType: "%",
 			Ratings:  make(map[string]Rating),
-			Values:   make([]Pulse, 0),
+			Current: Pulse{
+				Score:     0,
+				Timestamp: utils.Timestamp(),
+			},
+			Historical: make([]Pulse, 0),
 		},
 	}
 }

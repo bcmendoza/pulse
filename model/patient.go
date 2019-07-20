@@ -1,5 +1,7 @@
 package model
 
+import "github.com/bcmendoza/pulse/utils"
+
 // Attrs are inconsequential patient data
 // They are added to the Patient struct in unstructured JSON
 type Attrs map[string]string
@@ -10,14 +12,18 @@ type Patient struct {
 	Attrs
 }
 
-func (d *Department) AddPatient(label string) {
-	d.Children[label] = Patient{
+func (d *Department) AddPatient(owner string) {
+	d.Children[owner] = Patient{
 		Children: make(map[string]Metric),
 		Stream: Stream{
-			Label:    label,
+			Owner:    owner,
 			UnitType: "%",
 			Ratings:  make(map[string]Rating),
-			Values:   make([]Pulse, 0),
+			Current: Pulse{
+				Score:     0,
+				Timestamp: utils.Timestamp(),
+			},
+			Historical: make([]Pulse, 0),
 		},
 	}
 }

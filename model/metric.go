@@ -1,5 +1,7 @@
 package model
 
+import "github.com/bcmendoza/pulse/utils"
+
 // Metric represents a single numerical value
 // It never has any children, always nil
 type Metric struct {
@@ -7,14 +9,18 @@ type Metric struct {
 	Stream   Stream              `json:"stream"`
 }
 
-func (d *Department) AddMetric(label, unitType string) {
-	d.Children[label] = Patient{
+func (d *Department) AddMetric(owner, unitType string) {
+	d.Children[owner] = Patient{
 		Children: nil,
 		Stream: Stream{
-			Label:    label,
+			Owner:    owner,
 			UnitType: unitType,
 			Ratings:  make(map[string]Rating),
-			Values:   make([]Pulse, 0),
+			Current: Pulse{
+				Score:     0,
+				Timestamp: utils.Timestamp(),
+			},
+			Historical: make([]Pulse, 0),
 		},
 	}
 }

@@ -1,28 +1,29 @@
 package model
 
-import "time"
+import "github.com/bcmendoza/pulse/utils"
 
 // Stream is a slice of the avg of the Pulses of n Streams
 // Hospital Stream <- Departments Streams <- Patients Streams
 type Stream struct {
-	Label    string            `json:"label"`
-	UnitType string            `json:"unitType"`
-	Ratings  map[string]Rating `json:"ratings"`
-	Values   []Pulse           `json:"history"`
+	Owner      string            `json:"owner"`
+	UnitType   string            `json:"unitType"`
+	Ratings    map[string]Rating `json:"ratings"`
+	Current    Pulse             `json:"current"`
+	Historical []Pulse           `json:"historical"`
 }
 
 // Pulse is a single snapshot of data
 type Pulse struct {
-	Score     float64   `json:"score"`
-	Timestamp time.Time `json:"timestamp"`
-	RatingID  string    `json:"ratingID"`
+	Score       float64 `json:"score"`
+	Timestamp   int64   `json:"timestamp"`
+	RatingLabel string  `json:"ratingLabel"`
 }
 
-func MakePulse(score float64, ratingID string) Pulse {
+func MakePulse(score float64, ratingLabel string) Pulse {
 	return Pulse{
-		Score:     score,
-		Timestamp: time.Now(),
-		RatingID:  ratingID,
+		Score:       score,
+		Timestamp:   utils.Timestamp(),
+		RatingLabel: ratingLabel,
 	}
 }
 

@@ -2,6 +2,8 @@ package model
 
 import (
 	"sync"
+
+	"github.com/bcmendoza/pulse/utils"
 )
 
 // 1. Random patient metrics bubbling up
@@ -21,10 +23,14 @@ func New() *Hospital {
 	return &Hospital{
 		Children: make(map[string]Department),
 		Stream: Stream{
-			Label:    "hospital",
+			Owner:    "hospital",
 			UnitType: "%",
 			Ratings:  make(map[string]Rating),
-			Values:   make([]Pulse, 0),
+			Current: Pulse{
+				Score:     0,
+				Timestamp: utils.Timestamp(),
+			},
+			Historical: make([]Pulse, 0),
 		},
 	}
 }
