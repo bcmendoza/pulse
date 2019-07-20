@@ -20,6 +20,14 @@ func (hs *handlersState) addDepartment() func(http.ResponseWriter, *http.Request
 					return
 				}
 
+				if _, ok := hs.hospital.Children[req.Department]; ok {
+					logger.Error().AnErr("addDepartment()", errors.New("empty field(s)")).Msg("400 Bad Request")
+					Report(ProblemDetail{
+						StatusCode: http.StatusBadRequest,
+						Detail:     "Department already exists",
+					}, w)
+					return
+				}
 				hs.hospital.AddDepartment(req.Department)
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")

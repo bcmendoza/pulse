@@ -15,9 +15,22 @@ import (
 
 type Hospital struct {
 	sync.Mutex
-	Name     string                `json:"name"`
-	Children map[string]Department `json:"children"`
-	Stream   Stream                `json:"stream"`
+	Name        string                  `json:"name"`
+	Children    map[string]Department   `json:"children"`
+	Stream      Stream                  `json:"stream"`
+	PatientKeys map[PatientKey]struct{} `json:"-"`
+	MetricKeys  map[MetricKey]struct{}  `json:"-"`
+}
+
+type PatientKey struct {
+	Department string
+	Patient    string
+}
+
+type MetricKey struct {
+	Department string
+	Patient    string
+	Metric     string
 }
 
 func New() *Hospital {

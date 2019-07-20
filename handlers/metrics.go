@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/bcmendoza/pulse/model"
 )
 
 func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
@@ -16,6 +18,18 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 					Report(ProblemDetail{
 						StatusCode: http.StatusBadRequest,
 						Detail:     "Metric, and/or unitType are empty",
+					}, w)
+				}
+
+				if _, ok := hs.hospital.MetricKeys[model.MetricKey{
+					Department: req.Department,
+					Patient:    req.Patient,
+					Metric:     req.Metric,
+				}]; ok {
+					logger.Error().AnErr("addMetric()", errors.New("missing field(s)")).Msg("400 Bad Request")
+					Report(ProblemDetail{
+						StatusCode: http.StatusBadRequest,
+						Detail:     "Metric already exists",
 					}, w)
 				}
 

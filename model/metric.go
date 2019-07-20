@@ -35,6 +35,11 @@ func (h *Hospital) AddHospitalMetrics(metric, unitType string) {
 					Historical: make([]Pulse, 0),
 				},
 			}
+			h.MetricKeys[MetricKey{
+				Department: department,
+				Patient:    patient,
+				Metric:     metric,
+			}] = struct{}{}
 		}
 	}
 }
@@ -46,6 +51,7 @@ func (h *Hospital) AddDepartmentMetrics(department, metric, unitType string) {
 
 	for patient := range h.Children[department].Children {
 		h.Children[department].Children[patient].Children[metric] = Metric{
+			Name:     fmt.Sprintf("metric-%s", metric),
 			Children: nil,
 			Stream: Stream{
 				Owner:    metric,
@@ -58,6 +64,11 @@ func (h *Hospital) AddDepartmentMetrics(department, metric, unitType string) {
 				Historical: make([]Pulse, 0),
 			},
 		}
+		h.MetricKeys[MetricKey{
+			Department: department,
+			Patient:    patient,
+			Metric:     metric,
+		}] = struct{}{}
 	}
 }
 
@@ -79,4 +90,9 @@ func (h *Hospital) AddPatientMetric(department, patient, metric, unitType string
 			Historical: make([]Pulse, 0),
 		},
 	}
+	h.MetricKeys[MetricKey{
+		Department: department,
+		Patient:    patient,
+		Metric:     metric,
+	}] = struct{}{}
 }

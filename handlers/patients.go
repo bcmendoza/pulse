@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/bcmendoza/pulse/model"
 	"github.com/bcmendoza/pulse/utils"
 )
 
@@ -29,6 +30,17 @@ func (hs *handlersState) addPatient() func(http.ResponseWriter, *http.Request) {
 						Detail:     "Department name to add patient to is invalid",
 					}, w)
 					return
+				}
+
+				var uuid string
+				for uuid == "" {
+					temp := utils.UUID()
+					if _, ok := hs.hospital.PatientKeys[model.PatientKey{
+						Department: req.Department,
+						Patient:    temp,
+					}]; !ok {
+						uuid = temp
+					}
 				}
 				hs.hospital.AddPatient(req.Department, utils.UUID())
 				w.WriteHeader(http.StatusOK)
