@@ -1,15 +1,13 @@
-.DEFAULT_GOAL := build
- 
+.DEFAULT_GOAL := run
+
 #------------------------------------------------------------------------------
 #-- Common
 #------------------------------------------------------------------------------
 
-.PHONY: build
 build: vendor
 	@echo "Building binary..."
 	@go build --mod=vendor
 
-.PHONY: vendor
 test: vendor
 	@echo "Testing..."
 	@go test --mod=vendor
@@ -23,7 +21,25 @@ vendor:
 #-- Docker
 #------------------------------------------------------------------------------
 
-.PHONY: docker
-docker: build
+docker.image: build
 	@echo "Generating docker image..."
-	@docker build -f docker/Dockerfile -t bcmendoza/pulse:latest .
+	@docker build -t bcmendoza/pulse:latest .
+
+docker.run:
+	@docker run -d --name pulse -p 8080:8080 bcmendoza/pulse:latest
+
+docker.exec:
+	@docker exec -it pulse sh
+
+docker.stop:
+	@docker stop pulse
+	@docker rm pulse
+
+#------------------------------------------------------------------------------
+#-- push
+#------------------------------------------------------------------------------
+
+push:
+	@echo "Pushing Docker image..."
+	@heroku container:push latest -a pacific-chamber-17670
+	@heroku container:release latest

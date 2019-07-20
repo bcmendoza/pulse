@@ -16,6 +16,7 @@ WORKDIR /app
 
 # Copy over binary
 COPY --from=builder /go/src/github.com/bcmendoza/pulse/pulse /app/
+ADD ./docs /app/docs
 
 # Copy over UI
 # COPY --from=builder /go/src/github.com/bcmendoza/pulse/client/build /app/client
