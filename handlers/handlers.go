@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/bcmendoza/pulse/model"
@@ -33,7 +32,6 @@ func Handlers(hospital *model.Hospital, logger zerolog.Logger) http.Handler {
 func (hs *handlersState) getStreams() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if logger, ok := validateMethod("/streams", r.Method, "GET", hs.logger, w); ok {
-			logger.Info().Msg(fmt.Sprintf("%+v", hs.hospital))
 			jsonResp, err := json.Marshal(hs.hospital)
 			if err != nil {
 				logger.Error().AnErr("json.Marshal", err).Msg("Could not marshall response into JSON")
