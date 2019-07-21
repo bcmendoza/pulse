@@ -2,11 +2,10 @@ package model
 
 // Metric represents a single numerical value
 type Metric struct {
-	Type       string        `json:"type"`
-	Name       string        `json:"name"`
-	Stream     Stream        `json:"stream"`
-	Percent    float64       `json:"-"`
-	ParentChan chan struct{} `json:"-"`
+	Type    string  `json:"type"`
+	Name    string  `json:"name"`
+	Stream  Stream  `json:"stream"`
+	Percent float64 `json:"-"`
 }
 
 type MetricKey struct {
@@ -23,10 +22,9 @@ func (h *Hospital) AddHospitalMetrics(label, unitType string, lower, upper float
 	for d := range h.Children {
 		for p := range h.Children[d].Children {
 			h.Children[d].Children[p].Children[label] = Metric{
-				Type:       "metric",
-				Name:       label,
-				Stream:     MakeMetricStream(label, unitType, lower, upper),
-				ParentChan: h.Children[d].Children[p].UpdateChan,
+				Type:   "metric",
+				Name:   label,
+				Stream: MakeMetricStream(label, unitType, lower, upper),
 			}
 			h.MetricKeys[MetricKey{
 				Department: d,
@@ -44,10 +42,9 @@ func (h *Hospital) AddDepartmentMetrics(department, label, unitType string, lowe
 
 	for p := range h.Children[department].Children {
 		h.Children[department].Children[p].Children[label] = Metric{
-			Type:       "metric",
-			Name:       label,
-			Stream:     MakeMetricStream(label, unitType, lower, upper),
-			ParentChan: h.Children[department].Children[p].UpdateChan,
+			Type:   "metric",
+			Name:   label,
+			Stream: MakeMetricStream(label, unitType, lower, upper),
 		}
 		h.MetricKeys[MetricKey{
 			Department: department,
@@ -63,10 +60,9 @@ func (h *Hospital) AddPatientMetric(department, patient, label, unitType string,
 	defer h.Unlock()
 
 	h.Children[department].Children[patient].Children[label] = Metric{
-		Type:       "metric",
-		Name:       label,
-		Stream:     MakeMetricStream(label, unitType, lower, upper),
-		ParentChan: h.Children[department].Children[patient].UpdateChan,
+		Type:   "metric",
+		Name:   label,
+		Stream: MakeMetricStream(label, unitType, lower, upper),
 	}
 	h.MetricKeys[MetricKey{
 		Department: department,

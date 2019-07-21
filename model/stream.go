@@ -22,3 +22,9 @@ func MakeMetricStream(label, unitType string, lower, upper float64) Stream {
 	}
 	return stream
 }
+
+type Update struct {
+	Department string
+	Patient    string
+	Metric     string
+}

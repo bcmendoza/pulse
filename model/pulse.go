@@ -44,5 +44,8 @@ func (h *Hospital) AddMetricPulse(department, patient, metric string, value floa
 
 	percent := utils.CalcRelativePercent(value, m.Stream.Upper, m.Stream.Lower)
 	m.Percent = percent
-	m.ParentChan <- struct{}{}
+	h.UpdateChan <- Update{
+		Department: department,
+		Patient:    patient,
+	}
 }
