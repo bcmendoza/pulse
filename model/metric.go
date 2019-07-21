@@ -1,14 +1,9 @@
 package model
 
-import (
-	"fmt"
-
-	"github.com/bcmendoza/pulse/utils"
-)
-
 // Metric represents a single numerical value
 // It never has any children, always nil
 type Metric struct {
+	Type     string              `json:"type"`
 	Name     string              `json:"name"`
 	Children map[string]struct{} `json:"-"`
 	Stream   Stream              `json:"stream"`
@@ -21,30 +16,21 @@ type MetricKey struct {
 }
 
 // Adds metrics for all patients
-func (h *Hospital) AddHospitalMetrics(metric, unitType string) {
+func (h *Hospital) AddHospitalMetrics(label, unitType string, lower, upper float64) {
 	h.Lock()
 	defer h.Unlock()
 
 	for d, dept := range h.Children {
 		for p, pat := range dept.Children {
-			pat.Children[metric] = Metric{
-				Name:     fmt.Sprintf("metric-%s", metric),
-				Children: nil,
-				Stream: Stream{
-					Owner:    metric,
-					UnitType: unitType,
-					Ratings:  make(map[string]Rating),
-					Current: Pulse{
-						Score:     0,
-						Timestamp: utils.Timestamp(),
-					},
-					Historical: make([]Pulse, 0),
-				},
+			pat.Children[label] = Metric{
+				Type:   "metric",
+				Name:   label,
+				Stream: MakeMetricStream(label, unitType, lower, upper),
 			}
 			h.MetricKeys[MetricKey{
 				Department: d,
 				Patient:    p,
-				Metric:     metric,
+				Metric:     label,
 			}] = struct{}{}
 			dept.Children[p] = pat
 		}
@@ -53,30 +39,22 @@ func (h *Hospital) AddHospitalMetrics(metric, unitType string) {
 }
 
 // Adds metrics for patients in a single department
-func (h *Hospital) AddDepartmentMetrics(department, metric, unitType string) {
+func (h *Hospital) AddDepartmentMetrics(department, label, unitType string, lower, upper float64) {
 	h.Lock()
 	defer h.Unlock()
 
 	if dept, ok := h.Children[department]; ok {
 		for p, pat := range dept.Children {
-			pat.Children[metric] = Metric{
-				Name:     fmt.Sprintf("metric-%s", metric),
+			pat.Children[label] = Metric{
+				Type:     "metric",
+				Name:     label,
 				Children: nil,
-				Stream: Stream{
-					Owner:    metric,
-					UnitType: unitType,
-					Ratings:  make(map[string]Rating),
-					Current: Pulse{
-						Score:     0,
-						Timestamp: utils.Timestamp(),
-					},
-					Historical: make([]Pulse, 0),
-				},
+				Stream:   MakeMetricStream(label, unitType, lower, upper),
 			}
 			h.MetricKeys[MetricKey{
 				Department: department,
 				Patient:    p,
-				Metric:     metric,
+				Metric:     label,
 			}] = struct{}{}
 			dept.Children[p] = pat
 		}
@@ -85,30 +63,22 @@ func (h *Hospital) AddDepartmentMetrics(department, metric, unitType string) {
 }
 
 // Adds metrics for a single patient
-func (h *Hospital) AddPatientMetric(department, patient, metric, unitType string) {
+func (h *Hospital) AddPatientMetric(department, patient, label, unitType string, lower, upper float64) {
 	h.Lock()
 	defer h.Unlock()
 
 	if dept, ok := h.Children[department]; ok {
 		if pat, ok := dept.Children[patient]; ok {
-			pat.Children[metric] = Metric{
-				Name:     fmt.Sprintf("metric-%s", metric),
+			pat.Children[label] = Metric{
+				Type:     "metric",
+				Name:     label,
 				Children: nil,
-				Stream: Stream{
-					Owner:    metric,
-					UnitType: unitType,
-					Ratings:  make(map[string]Rating),
-					Current: Pulse{
-						Score:     0,
-						Timestamp: utils.Timestamp(),
-					},
-					Historical: make([]Pulse, 0),
-				},
+				Stream:   MakeMetricStream(label, unitType, lower, upper),
 			}
 			h.MetricKeys[MetricKey{
 				Department: department,
 				Patient:    patient,
-				Metric:     metric,
+				Metric:     label,
 			}] = struct{}{}
 			dept.Children[patient] = pat
 		}

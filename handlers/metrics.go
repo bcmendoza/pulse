@@ -13,7 +13,7 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 		if logger, ok := validateMethod("/metrics", r.Method, "POST", hs.logger, w); ok {
 			req, ok := validateRequestFields(r.Body, logger, w)
 			if ok {
-				if req.Metric == "" || req.UnitType == "" {
+				if req.Metric == "" || req.UnitType == "" || req.Lower == 0 || req.Upper == 0 {
 					logger.Error().AnErr("addMetric()", errors.New("missing field(s)")).Msg("400 Bad Request")
 					Report(ProblemDetail{
 						StatusCode: http.StatusBadRequest,
@@ -35,21 +35,16 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 
 				success := false
 				if req.Patient == "" && req.Department == "" {
-					hs.hospital.AddHospitalMetrics(req.Metric, req.UnitType)
+					hs.hospital.AddHospitalMetrics(req.Metric, req.UnitType, req.Lower, req.Upper)
 					success = true
-				} else if req.Patient == "" && req.Department != "" {
-					if _, ok := hs.hospital.Children[req.Department]; ok {
-						hs.hospital.AddDepartmentMetrics(req.Department, req.Metric, req.UnitType)
-						success = true
-					}
-				} else if req.Patient != "" && req.Department != "" {
-					if _, ok := hs.hospital.PatientKeys[model.PatientKey{
-						Department: req.Department,
-						Patient:    req.Patient,
-					}]; ok {
-						hs.hospital.AddPatientMetric(req.Department, req.Patient, req.Metric, req.UnitType)
-						success = true
-					}
+				}
+				if req.Patient == "" && req.Department != "" {
+					hs.hospital.AddDepartmentMetrics(req.Department, req.Metric, req.UnitType, req.Lower, req.Upper)
+					success = true
+				}
+				if req.Patient != "" && req.Department != "" {
+					hs.hospital.AddPatientMetric(req.Department, req.Patient, req.Metric, req.UnitType, req.Lower, req.Upper)
+					success = true
 				}
 
 				if success == false {
@@ -63,7 +58,7 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
-				jsonResp := fmt.Sprintf("{\"added\": \"metric-%s\"}", req.Metric)
+				jsonResp := fmt.Sprintf("{\"added\": \"%s\"}", req.Metric)
 				if _, err := w.Write([]byte(jsonResp)); err != nil {
 					logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
 				} else {

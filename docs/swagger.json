@@ -107,7 +107,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "example": "department-ICU"
+          "example": "ICU"
         },
         "children": {
           "type": "object",
@@ -125,7 +125,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "example": "patient-39fd6a79-1791-4117-9d14-9a7b2118f930"
+          "example": "39fd6a79-1791-4117-9d14-9a7b2118f930"
         },
         "children": {
           "type": "object",
@@ -143,69 +143,6 @@
       "properties": {
         "stream": {
           "$ref": "#/definitions/Stream"
-        }
-      }
-    },
-    "AddDepartmentOrPatient": {
-      "type": "object",
-      "properties": {
-        "department": {
-          "type": "string",
-          "example": "ICU"
-        }
-      }
-    },
-    "AddMetric": {
-      "type": "object",
-      "properties": {
-        "department": {
-          "type": "string",
-          "example": "ICU"
-        },
-        "patient": {
-          "type": "string",
-          "example": "patient-39fd6a79-1791-4117-9d14-9a7b2118f930"
-        },
-        "metric": {
-          "type": "string",
-          "example": "Heart Rate"
-        },
-        "unitType": {
-          "type": "string",
-          "example": "BPM"
-        }
-      },
-      "required": ["metric", "unitType"]
-    },
-    "AddMetricPulse": {
-      "type": "object",
-      "properties": {
-        "department": {
-          "type": "string",
-          "example": "ICU"
-        },
-        "patient": {
-          "type": "string",
-          "example": "patient-39fd6a79-1791-4117-9d14-9a7b2118f930"
-        },
-        "metric": {
-          "type": "string",
-          "example": "Heart Rate"
-        },
-        "value": {
-          "type": "number",
-          "format": "float",
-          "example": 93.26
-        }
-      },
-      "required": ["department", "patient", "metric", "value"]
-    },
-    "CreatedResponse": {
-      "type": "object",
-      "properties": {
-        "created": {
-          "type": "string",
-          "example": "NICU"
         }
       }
     },
@@ -261,7 +198,13 @@
             "description": "Add a department",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/AddDepartmentOrPatient"
+              "type": "object",
+              "properties": {
+                "department": {
+                  "type": "string",
+                  "example": "ICU"
+                }
+              }
             }
           }
         ],
@@ -269,7 +212,13 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/CreatedResponse"
+              "type": "object",
+              "properties": {
+                "added": {
+                  "type": "string",
+                  "example": "NICU"
+                }
+              }
             }
           },
           "default": {
@@ -295,7 +244,13 @@
             "description": "Add a patient",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/AddDepartmentOrPatient"
+              "type": "object",
+              "properties": {
+                "department": {
+                  "type": "string",
+                  "example": "ICU"
+                }
+              }
             }
           }
         ],
@@ -303,7 +258,13 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/CreatedResponse"
+              "type": "object",
+              "properties": {
+                "added": {
+                  "type": "string",
+                  "example": "NICU"
+                }
+              }
             }
           },
           "default": {
@@ -329,7 +290,26 @@
             "description": "Add a metric. To apply to all patients, leave 'patient' and 'department' keys empty. To apply to a department's patients, leave 'patient' empty. Otherwise, to apply to a patient, all fields are required.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/AddMetric"
+              "type": "object",
+              "properties": {
+                "department": {
+                  "type": "string",
+                  "example": "ICU"
+                },
+                "patient": {
+                  "type": "string",
+                  "example": "patient-39fd6a79-1791-4117-9d14-9a7b2118f930"
+                },
+                "metric": {
+                  "type": "string",
+                  "example": "Heart Rate"
+                },
+                "unitType": {
+                  "type": "string",
+                  "example": "BPM"
+                }
+              },
+              "required": ["metric", "unitType"]
             }
           }
         ],
@@ -337,7 +317,13 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/CreatedResponse"
+              "type": "object",
+              "properties": {
+                "added": {
+                  "type": "string",
+                  "example": "NICU"
+                }
+              }
             }
           },
           "default": {
@@ -363,7 +349,27 @@
             "description": "Add a metric pulse",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/AddMetricPulse"
+              "type": "object",
+              "properties": {
+                "department": {
+                  "type": "string",
+                  "example": "ICU"
+                },
+                "patient": {
+                  "type": "string",
+                  "example": "patient-39fd6a79-1791-4117-9d14-9a7b2118f930"
+                },
+                "metric": {
+                  "type": "string",
+                  "example": "Heart Rate"
+                },
+                "value": {
+                  "type": "number",
+                  "format": "float",
+                  "example": 93.26
+                }
+              },
+              "required": ["department", "patient", "metric", "value"]
             }
           }
         ],
@@ -371,7 +377,14 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/CreatedResponse"
+              "type": "object",
+              "properties": {
+                "added": {
+                  "type": "number",
+                  "format": "float",
+                  "example": 93.26
+                }
+              }
             }
           },
           "default": {

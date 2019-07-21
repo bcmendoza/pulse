@@ -20,6 +20,8 @@ type RequestBody struct {
 	Patient    string  `json:"patient"`
 	Metric     string  `json:"metric"`
 	UnitType   string  `json:"unitType"`
+	Lower      float64 `json:"lower"`
+	Upper      float64 `json:"upper"`
 	Value      float64 `json:"value"`
 }
 

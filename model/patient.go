@@ -1,12 +1,7 @@
 package model
 
-import (
-	"fmt"
-
-	"github.com/bcmendoza/pulse/utils"
-)
-
 type Patient struct {
+	Type     string            `json:"type"`
 	Name     string            `json:"name"`
 	Children map[string]Metric `json:"children"`
 	Stream   Stream            `json:"stream"`
@@ -22,17 +17,16 @@ func (h *Hospital) AddPatient(department, patient string) {
 	defer h.Unlock()
 
 	h.Children[department].Children[patient] = Patient{
-		Name:     fmt.Sprintf("patient-%s", patient),
+		Type:     "patient",
+		Name:     patient,
 		Children: make(map[string]Metric),
 		Stream: Stream{
-			Owner:    patient,
-			UnitType: "%",
-			Ratings:  make(map[string]Rating),
-			Current: Pulse{
-				Score:     0,
-				Timestamp: utils.Timestamp(),
-			},
-			Historical: make([]Pulse, 0),
+			Owner:      patient,
+			UnitType:   "%",
+			History:    make([]Pulse, 0),
+			Lower:      0,
+			Upper:      100,
+			Thresholds: []float64{33.33, 66.66},
 		},
 	}
 }

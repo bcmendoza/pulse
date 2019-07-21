@@ -2,8 +2,6 @@ package model
 
 import (
 	"sync"
-
-	"github.com/bcmendoza/pulse/utils"
 )
 
 // 1. Random patient metrics bubbling up
@@ -15,7 +13,7 @@ import (
 
 type Hospital struct {
 	sync.Mutex
-	Name        string                  `json:"name"`
+	Type        string                  `json:"type"`
 	Children    map[string]Department   `json:"children"`
 	Stream      Stream                  `json:"stream"`
 	PatientKeys map[PatientKey]struct{} `json:"-"`
@@ -24,17 +22,15 @@ type Hospital struct {
 
 func New() *Hospital {
 	return &Hospital{
-		Name:     "hospital",
+		Type:     "hospital",
 		Children: make(map[string]Department),
 		Stream: Stream{
-			Owner:    "hospital",
-			UnitType: "%",
-			Ratings:  make(map[string]Rating),
-			Current: Pulse{
-				Score:     0,
-				Timestamp: utils.Timestamp(),
-			},
-			Historical: make([]Pulse, 0),
+			Owner:      "hospital",
+			UnitType:   "%",
+			History:    make([]Pulse, 0),
+			Lower:      0,
+			Upper:      100,
+			Thresholds: []float64{33.33, 66.66},
 		},
 	}
 }
