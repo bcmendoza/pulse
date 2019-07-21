@@ -1,12 +1,12 @@
 package model
 
 // Metric represents a single numerical value
-// It never has any children, always nil
 type Metric struct {
-	Type     string              `json:"type"`
-	Name     string              `json:"name"`
-	Children map[string]struct{} `json:"-"`
-	Stream   Stream              `json:"stream"`
+	Type       string        `json:"type"`
+	Name       string        `json:"name"`
+	Stream     Stream        `json:"stream"`
+	Percent    float64       `json:"-"`
+	ParentChan chan struct{} `json:"-"`
 }
 
 type MetricKey struct {
@@ -23,9 +23,10 @@ func (h *Hospital) AddHospitalMetrics(label, unitType string, lower, upper float
 	for d := range h.Children {
 		for p := range h.Children[d].Children {
 			h.Children[d].Children[p].Children[label] = Metric{
-				Type:   "metric",
-				Name:   label,
-				Stream: MakeMetricStream(label, unitType, lower, upper),
+				Type:       "metric",
+				Name:       label,
+				Stream:     MakeMetricStream(label, unitType, lower, upper),
+				ParentChan: h.Children[d].Children[p].UpdateChan,
 			}
 			h.MetricKeys[MetricKey{
 				Department: d,
@@ -43,10 +44,10 @@ func (h *Hospital) AddDepartmentMetrics(department, label, unitType string, lowe
 
 	for p := range h.Children[department].Children {
 		h.Children[department].Children[p].Children[label] = Metric{
-			Type:     "metric",
-			Name:     label,
-			Children: nil,
-			Stream:   MakeMetricStream(label, unitType, lower, upper),
+			Type:       "metric",
+			Name:       label,
+			Stream:     MakeMetricStream(label, unitType, lower, upper),
+			ParentChan: h.Children[department].Children[p].UpdateChan,
 		}
 		h.MetricKeys[MetricKey{
 			Department: department,
@@ -62,31 +63,14 @@ func (h *Hospital) AddPatientMetric(department, patient, label, unitType string,
 	defer h.Unlock()
 
 	h.Children[department].Children[patient].Children[label] = Metric{
-		Type:     "metric",
-		Name:     label,
-		Children: nil,
-		Stream:   MakeMetricStream(label, unitType, lower, upper),
+		Type:       "metric",
+		Name:       label,
+		Stream:     MakeMetricStream(label, unitType, lower, upper),
+		ParentChan: h.Children[department].Children[patient].UpdateChan,
 	}
 	h.MetricKeys[MetricKey{
 		Department: department,
 		Patient:    patient,
 		Metric:     label,
 	}] = struct{}{}
-}
-
-// Adds a new Pulse to a given Metric's stream
-func (h *Hospital) AddMetricPulse(department, patient, metric string, value float64) {
-	h.Lock()
-	defer h.Unlock()
-
-	if _, ok := h.MetricKeys[MetricKey{
-		Department: department,
-		Patient:    patient,
-		Metric:     metric,
-	}]; !ok {
-		return
-	}
-
-	history := h.Children[department].Children[patient].Children[metric].Stream.History
-
 }

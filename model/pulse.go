@@ -24,3 +24,25 @@ func MakePulse(score float64, thresholds []float64) Pulse {
 
 	return pulse
 }
+
+// Adds a new Pulse to a given Metric's stream
+func (h *Hospital) AddMetricPulse(department, patient, metric string, value float64) {
+	h.Lock()
+	defer h.Unlock()
+
+	if _, ok := h.MetricKeys[MetricKey{
+		Department: department,
+		Patient:    patient,
+		Metric:     metric,
+	}]; !ok {
+		return
+	}
+
+	m := h.Children[department].Children[patient].Children[metric]
+	m.Stream.History = append(m.Stream.History, MakePulse(value, m.Stream.Thresholds))
+	h.Children[department].Children[patient].Children[metric] = m
+
+	percent := utils.CalcRelativePercent(value, m.Stream.Upper, m.Stream.Lower)
+	m.Percent = percent
+	m.ParentChan <- struct{}{}
+}

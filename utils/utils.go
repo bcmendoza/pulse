@@ -22,3 +22,7 @@ func CalcThresholds(lower, upper float64) []float64 {
 	thresh2 := thresh1 + thirdAmt
 	return []float64{thresh1, thresh2}
 }
+
+func CalcRelativePercent(input, max, min float64) float64 {
+	return ((input - min) * 100) / (max - min)
+}

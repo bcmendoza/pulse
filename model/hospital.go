@@ -4,24 +4,17 @@ import (
 	"sync"
 )
 
-// 1. Random patient metrics bubbling up
-// 2. REST API for getting metrics
-// 3. REST APi for measurement fields
-// 4. REST API for setting metrics via fields
-// 5. Multiple outcomes per department
-// 6. Multiple outcomes per patient
-
 type Hospital struct {
 	sync.Mutex
-	Type        string                  `json:"type"`
-	Children    map[string]Department   `json:"children"`
-	Stream      Stream                  `json:"stream"`
-	PatientKeys map[PatientKey]struct{} `json:"-"`
-	MetricKeys  map[MetricKey]struct{}  `json:"-"`
+	Type       string                 `json:"type"`
+	Children   map[string]Department  `json:"children"`
+	Stream     Stream                 `json:"stream"`
+	MetricKeys map[MetricKey]struct{} `json:"-"`
+	UpdateChan chan struct{}          `json:"-"`
 }
 
 func New() *Hospital {
-	return &Hospital{
+	h := &Hospital{
 		Type:     "hospital",
 		Children: make(map[string]Department),
 		Stream: Stream{
@@ -31,7 +24,25 @@ func New() *Hospital {
 			Upper:      100,
 			Thresholds: []float64{33.33, 66.66},
 		},
-		PatientKeys: make(map[PatientKey]struct{}),
-		MetricKeys:  make(map[MetricKey]struct{}),
+		MetricKeys: make(map[MetricKey]struct{}),
+		UpdateChan: make(chan struct{}, 1),
+	}
+	go h.Subscribe()
+	return h
+}
+
+func (h *Hospital) Subscribe() {
+	for range h.UpdateChan {
+		var size, sum float64
+		for _, d := range h.Children {
+			if s := len(d.Stream.History); s > 0 {
+				size++
+				sum += d.Stream.History[s-1].Score
+			}
+		}
+		h.Stream.History = append(
+			h.Stream.History,
+			MakePulse(sum/float64(size), h.Stream.Thresholds),
+		)
 	}
 }
