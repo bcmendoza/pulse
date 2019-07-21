@@ -70,26 +70,30 @@ func (h *Hospital) LoadTestSchemas() {
 		for i := 0; i < 2; i++ {
 			h.AddPatient(k, utils.UUID())
 		}
-		for i := 0; i < 2; i++ {
-			h.AddHospitalMetrics(utils.UUID(), "x", 1, 1000)
-		}
 	}
-	go h.RunGenerator()
+	for _, m := range allMetrics {
+		h.AddHospitalMetrics(m.Label, m.UnitType, m.Lower, m.Upper)
+	}
 }
 
 func (h *Hospital) RunGenerator() {
+	t, err := time.ParseDuration("5m")
+	if err != nil {
+	}
+	ticker := time.NewTicker(t)
+INFINITE_LOOP:
 	for {
 		for k := range h.MetricKeys {
-			h.AddMetricPulse(
-				k.Department,
-				k.Patient,
-				k.Metric,
-				float64(rand.Intn(999)),
-			)
-			d, err := time.ParseDuration(fmt.Sprintf("%ds", rand.Intn(5)))
-			if err != nil {
+			if m, ok := h.Children[k.Department].Children[k.Patient].Children[k.Metric]; ok {
+				h.AddMetricPulse(k.Department, k.Patient, k.Metric, utils.Random(m.Stream.Lower, m.Stream.Upper))
+				d, err := time.ParseDuration(fmt.Sprintf("%ds", rand.Intn(5)))
+				if err != nil {
+				}
+				time.Sleep(d)
 			}
-			time.Sleep(d)
+		}
+		for range ticker.C {
+			break INFINITE_LOOP
 		}
 	}
 }

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/google/uuid"
@@ -25,4 +26,8 @@ func CalcThresholds(lower, upper float64) []float64 {
 
 func CalcRelativePercent(input, max, min float64) float64 {
 	return ((input - min) * 100) / (max - min)
+}
+
+func Random(min, max float64) float64 {
+	return min + rand.Float64()*(max-min)
 }

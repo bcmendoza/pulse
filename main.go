@@ -35,7 +35,7 @@ func main() {
 
 	hospital := model.New()
 
-	// test
+	// demo mode
 	hospital.LoadTestSchemas()
 
 	// REST server

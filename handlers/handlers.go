@@ -24,6 +24,7 @@ func Handlers(hospital *model.Hospital, logger zerolog.Logger) http.Handler {
 	r.HandleFunc("/patients", hs.addPatient())
 	r.HandleFunc("/metrics", hs.addMetric())
 	r.HandleFunc("/pulses", hs.addMetricPulse())
+	r.HandleFunc("/demo", hs.startDemo())
 	// r.PathPrefix("/").Handler(http.FileServer(http.Dir("/app/client")))
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/app/docs")))
 	return r
@@ -50,6 +51,19 @@ func (hs *handlersState) getStreams() func(http.ResponseWriter, *http.Request) {
 			} else {
 				logger.Info().Msg("200 OK")
 			}
+		}
+	}
+}
+
+func (hs *handlersState) startDemo() func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		jsonResp := "{\"started\": \"streaming for 5 minutes\"}"
+		if _, err := w.Write([]byte(jsonResp)); err != nil {
+			hs.logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
+		} else {
+			hs.logger.Info().Msg("200 OK")
 		}
 	}
 }
