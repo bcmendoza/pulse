@@ -17,8 +17,9 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 					logger.Error().AnErr("addMetric()", errors.New("missing field(s)")).Msg("400 Bad Request")
 					Report(ProblemDetail{
 						StatusCode: http.StatusBadRequest,
-						Detail:     "Metric, and/or unitType are empty",
+						Detail:     "Metric, unitType, lower, or upper are empty",
 					}, w)
+					return
 				}
 
 				if _, ok := hs.hospital.MetricKeys[model.MetricKey{
@@ -31,8 +32,10 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 						StatusCode: http.StatusBadRequest,
 						Detail:     "Metric already exists",
 					}, w)
+					return
 				}
 
+				hs.logger.Info().Msg(fmt.Sprintf("req: %+v", req))
 				success := false
 				if req.Patient == "" && req.Department == "" {
 					hs.hospital.AddHospitalMetrics(req.Metric, req.UnitType, req.Lower, req.Upper)

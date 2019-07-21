@@ -32,5 +32,7 @@ func New() *Hospital {
 			Upper:      100,
 			Thresholds: []float64{33.33, 66.66},
 		},
+		PatientKeys: make(map[PatientKey]struct{}),
+		MetricKeys:  make(map[MetricKey]struct{}),
 	}
 }
