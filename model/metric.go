@@ -20,9 +20,9 @@ func (h *Hospital) AddHospitalMetrics(label, unitType string, lower, upper float
 	h.Lock()
 	defer h.Unlock()
 
-	for d, dept := range h.Children {
-		for p, pat := range dept.Children {
-			pat.Children[label] = Metric{
+	for d := range h.Children {
+		for p := range h.Children[d].Children {
+			h.Children[d].Children[p].Children[label] = Metric{
 				Type:   "metric",
 				Name:   label,
 				Stream: MakeMetricStream(label, unitType, lower, upper),
@@ -32,9 +32,7 @@ func (h *Hospital) AddHospitalMetrics(label, unitType string, lower, upper float
 				Patient:    p,
 				Metric:     label,
 			}] = struct{}{}
-			dept.Children[p] = pat
 		}
-		h.Children[d] = dept
 	}
 }
 
@@ -43,22 +41,18 @@ func (h *Hospital) AddDepartmentMetrics(department, label, unitType string, lowe
 	h.Lock()
 	defer h.Unlock()
 
-	if dept, ok := h.Children[department]; ok {
-		for p, pat := range dept.Children {
-			pat.Children[label] = Metric{
-				Type:     "metric",
-				Name:     label,
-				Children: nil,
-				Stream:   MakeMetricStream(label, unitType, lower, upper),
-			}
-			h.MetricKeys[MetricKey{
-				Department: department,
-				Patient:    p,
-				Metric:     label,
-			}] = struct{}{}
-			dept.Children[p] = pat
+	for p := range h.Children[department].Children {
+		h.Children[department].Children[p].Children[label] = Metric{
+			Type:     "metric",
+			Name:     label,
+			Children: nil,
+			Stream:   MakeMetricStream(label, unitType, lower, upper),
 		}
-		h.Children[department] = dept
+		h.MetricKeys[MetricKey{
+			Department: department,
+			Patient:    p,
+			Metric:     label,
+		}] = struct{}{}
 	}
 }
 
@@ -67,23 +61,17 @@ func (h *Hospital) AddPatientMetric(department, patient, label, unitType string,
 	h.Lock()
 	defer h.Unlock()
 
-	if dept, ok := h.Children[department]; ok {
-		if pat, ok := dept.Children[patient]; ok {
-			pat.Children[label] = Metric{
-				Type:     "metric",
-				Name:     label,
-				Children: nil,
-				Stream:   MakeMetricStream(label, unitType, lower, upper),
-			}
-			h.MetricKeys[MetricKey{
-				Department: department,
-				Patient:    patient,
-				Metric:     label,
-			}] = struct{}{}
-			dept.Children[patient] = pat
-		}
-		h.Children[department] = dept
+	h.Children[department].Children[patient].Children[label] = Metric{
+		Type:     "metric",
+		Name:     label,
+		Children: nil,
+		Stream:   MakeMetricStream(label, unitType, lower, upper),
 	}
+	h.MetricKeys[MetricKey{
+		Department: department,
+		Patient:    patient,
+		Metric:     label,
+	}] = struct{}{}
 }
 
 // Adds a new Pulse to a given Metric's stream

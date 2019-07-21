@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bcmendoza/pulse/model"
 	"github.com/bcmendoza/pulse/utils"
 )
 
@@ -14,6 +13,8 @@ func (hs *handlersState) addPatient() func(http.ResponseWriter, *http.Request) {
 		if logger, ok := validateMethod("/patients", r.Method, "POST", hs.logger, w); ok {
 			req, ok := validateRequestFields(r.Body, logger, w)
 			if ok {
+
+				// blank
 				if req.Department == "" {
 					logger.Error().AnErr("addPatient()", errors.New("missing field(s)")).Msg("400 Bad Request")
 					Report(ProblemDetail{
@@ -23,6 +24,7 @@ func (hs *handlersState) addPatient() func(http.ResponseWriter, *http.Request) {
 					return
 				}
 
+				// no dept
 				if _, ok := hs.hospital.Children[req.Department]; !ok {
 					logger.Error().AnErr("addPatient()", errors.New("missing field(s)")).Msg("400 Bad Request")
 					Report(ProblemDetail{
@@ -32,17 +34,8 @@ func (hs *handlersState) addPatient() func(http.ResponseWriter, *http.Request) {
 					return
 				}
 
-				var uuid string
-				for uuid == "" {
-					temp := utils.UUID()
-					if _, ok := hs.hospital.PatientKeys[model.PatientKey{
-						Department: req.Department,
-						Patient:    temp,
-					}]; !ok {
-						uuid = temp
-					}
-				}
-				hs.hospital.AddPatient(req.Department, utils.UUID())
+				uuid := utils.UUID()
+				hs.hospital.AddPatient(req.Department, uuid)
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				jsonResp := fmt.Sprintf("{\"added\": \"%s\"}", uuid)

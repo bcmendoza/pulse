@@ -13,6 +13,8 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 		if logger, ok := validateMethod("/metrics", r.Method, "POST", hs.logger, w); ok {
 			req, ok := validateRequestFields(r.Body, logger, w)
 			if ok {
+
+				// bank
 				if req.Metric == "" || req.UnitType == "" || req.Lower == 0 || req.Upper == 0 {
 					logger.Error().AnErr("addMetric()", errors.New("missing field(s)")).Msg("400 Bad Request")
 					Report(ProblemDetail{
@@ -22,6 +24,7 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 					return
 				}
 
+				// exists -- too little time to validate dups
 				if _, ok := hs.hospital.MetricKeys[model.MetricKey{
 					Department: req.Department,
 					Patient:    req.Patient,
@@ -35,21 +38,30 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 					return
 				}
 
-				hs.logger.Info().Msg(fmt.Sprintf("req: %+v", req))
+				// pattern matching would be nice here
 				success := false
 				if req.Patient == "" && req.Department == "" {
 					hs.hospital.AddHospitalMetrics(req.Metric, req.UnitType, req.Lower, req.Upper)
 					success = true
 				}
 				if req.Patient == "" && req.Department != "" {
-					hs.hospital.AddDepartmentMetrics(req.Department, req.Metric, req.UnitType, req.Lower, req.Upper)
-					success = true
+					if _, ok := hs.hospital.Children[req.Department]; ok {
+						hs.hospital.AddDepartmentMetrics(req.Department, req.Metric, req.UnitType, req.Lower, req.Upper)
+						success = true
+					}
 				}
 				if req.Patient != "" && req.Department != "" {
-					hs.hospital.AddPatientMetric(req.Department, req.Patient, req.Metric, req.UnitType, req.Lower, req.Upper)
-					success = true
+					if _, ok := hs.hospital.MetricKeys[model.MetricKey{
+						Department: req.Department,
+						Patient:    req.Patient,
+						Metric:     req.Metric,
+					}]; ok {
+						hs.hospital.AddPatientMetric(req.Department, req.Patient, req.Metric, req.UnitType, req.Lower, req.Upper)
+						success = true
+					}
 				}
 
+				// catch all, nothing happened, doh
 				if success == false {
 					logger.Error().AnErr("addMetric()", errors.New("invalid field(s)")).Msg("400 Bad Request")
 					Report(ProblemDetail{

@@ -11,6 +11,8 @@ func (hs *handlersState) addDepartment() func(http.ResponseWriter, *http.Request
 		if logger, ok := validateMethod("/departments", r.Method, "POST", hs.logger, w); ok {
 			req, ok := validateRequestFields(r.Body, logger, w)
 			if ok {
+
+				// blank
 				if req.Department == "" {
 					logger.Error().AnErr("addDepartment()", errors.New("empty field(s)")).Msg("400 Bad Request")
 					Report(ProblemDetail{
@@ -20,6 +22,7 @@ func (hs *handlersState) addDepartment() func(http.ResponseWriter, *http.Request
 					return
 				}
 
+				// exists
 				if _, ok := hs.hospital.Children[req.Department]; ok {
 					logger.Error().AnErr("addDepartment()", errors.New("empty field(s)")).Msg("400 Bad Request")
 					Report(ProblemDetail{
@@ -28,6 +31,7 @@ func (hs *handlersState) addDepartment() func(http.ResponseWriter, *http.Request
 					}, w)
 					return
 				}
+
 				hs.hospital.AddDepartment(req.Department)
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
