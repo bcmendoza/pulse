@@ -86,12 +86,12 @@ INFINITE_LOOP:
 		for k := range h.MetricKeys {
 			if m, ok := h.Children[k.Department].Children[k.Patient].Children[k.Metric]; ok {
 				h.AddMetricPulse(k.Department, k.Patient, k.Metric, utils.Random(m.Stream.Lower, m.Stream.Upper))
-				d, err := time.ParseDuration(fmt.Sprintf("%ds", rand.Intn(5)))
-				if err != nil {
-				}
-				time.Sleep(d)
 			}
 		}
+		d, err := time.ParseDuration(fmt.Sprintf("%ds", rand.Intn(5)))
+		if err != nil {
+		}
+		time.Sleep(d)
 		for range ticker.C {
 			break INFINITE_LOOP
 		}
