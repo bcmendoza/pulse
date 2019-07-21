@@ -16,7 +16,6 @@ func (h *Hospital) AddDepartment(name string) {
 		Name:     name,
 		Children: make(map[string]Patient),
 		Stream: Stream{
-			Owner:      name,
 			UnitType:   "%",
 			History:    make([]Pulse, 0),
 			Lower:      0,

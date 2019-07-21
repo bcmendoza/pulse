@@ -25,7 +25,6 @@ func New() *Hospital {
 		Type:     "hospital",
 		Children: make(map[string]Department),
 		Stream: Stream{
-			Owner:      "hospital",
 			UnitType:   "%",
 			History:    make([]Pulse, 0),
 			Lower:      0,

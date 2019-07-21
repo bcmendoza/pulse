@@ -21,7 +21,6 @@ func (h *Hospital) AddPatient(department, patient string) {
 		Name:     patient,
 		Children: make(map[string]Metric),
 		Stream: Stream{
-			Owner:      patient,
 			UnitType:   "%",
 			History:    make([]Pulse, 0),
 			Lower:      0,

@@ -17,28 +17,25 @@
     "Stream": {
       "type": "object",
       "properties": {
-        "owner": {
-          "type": "string",
-          "example": "hospital"
-        },
         "unitType": {
           "type": "unitType",
-          "example": "%"
+          "example": "BPM"
         },
-        "ratings": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/Rating"
-          }
-        },
-        "current": {
-          "$ref": "#/definitions/Pulse"
-        },
-        "historical": {
+        "history": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Pulse"
           }
+        },
+        "lower": {
+          "type": "number",
+          "format": "float",
+          "example": 33.3
+        },
+        "upper": {
+          "type": "number",
+          "format": "float",
+          "example": 82.1
         }
       }
     },
@@ -55,39 +52,16 @@
           "example": "2017-07-21T17:32:28Z",
           "format": "date-time"
         },
-        "ratingLabel": {
-          "type": "string",
-          "example": "Critical"
-        }
-      }
-    },
-    "Rating": {
-      "type": "object",
-      "properties": {
-        "label": {
-          "type": "string",
-          "example": "Critical"
-        },
-        "color": {
-          "type": "string",
-          "example": "#FF4500"
-        },
-        "lte": {
-          "type": "number",
-          "format": "float",
-          "example": 33.3
-        },
-        "gte": {
-          "type": "number",
-          "format": "float",
-          "example": 0.0
+        "rating": {
+          "type": "integer",
+          "example": 2
         }
       }
     },
     "Hospital": {
       "type": "object",
       "properties": {
-        "name": {
+        "type": {
           "type": "string",
           "example": "hospital"
         },
@@ -105,6 +79,10 @@
     "Department": {
       "type": "object",
       "properties": {
+        "type": {
+          "type": "string",
+          "example": "department"
+        },
         "name": {
           "type": "string",
           "example": "ICU"
@@ -123,6 +101,10 @@
     "Patient": {
       "type": "object",
       "properties": {
+        "type": {
+          "type": "string",
+          "example": "patient"
+        },
         "name": {
           "type": "string",
           "example": "39fd6a79-1791-4117-9d14-9a7b2118f930"
@@ -141,6 +123,14 @@
     "Metric": {
       "type": "object",
       "properties": {
+        "type": {
+          "type": "string",
+          "example": "metric"
+        },
+        "name": {
+          "type": "string",
+          "example": "Heart Rate"
+        },
         "stream": {
           "$ref": "#/definitions/Stream"
         }

@@ -87,7 +87,6 @@ func (h *Hospital) AddMetricPulse(department, patient, metric string, value floa
 		return
 	}
 
-	// test
-	m := h.Children[department].Children[patient].Children[metric]
-	h.Children[department].Children[patient].Children[metric] = m
+	history := h.Children[department].Children[patient].Children[metric].Stream.History
+
 }
