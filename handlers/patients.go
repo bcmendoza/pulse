@@ -11,7 +11,7 @@ import (
 
 func (hs *handlersState) addPatient() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if logger, ok := validateMethod("/department", r.Method, "POST", hs.logger, w); ok {
+		if logger, ok := validateMethod("/patients", r.Method, "POST", hs.logger, w); ok {
 			req, ok := validateRequestFields(r.Body, logger, w)
 			if ok {
 				if req.Department == "" {
@@ -45,7 +45,7 @@ func (hs *handlersState) addPatient() func(http.ResponseWriter, *http.Request) {
 				hs.hospital.AddPatient(req.Department, utils.UUID())
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
-				jsonResp := fmt.Sprintf("{\"created\": \"%s\"}", uuid)
+				jsonResp := fmt.Sprintf("{\"added\": \"%s\"}", uuid)
 				if _, err := w.Write([]byte(jsonResp)); err != nil {
 					logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
 				} else {

@@ -118,6 +118,9 @@ func (h *Hospital) AddPatientMetric(department, patient, metric, unitType string
 
 // Adds a new Pulse to a given Metric's stream
 func (h *Hospital) AddMetricPulse(department, patient, metric string, value float64) {
+	h.Lock()
+	defer h.Unlock()
+
 	if _, ok := h.MetricKeys[MetricKey{
 		Department: department,
 		Patient:    patient,
@@ -125,4 +128,8 @@ func (h *Hospital) AddMetricPulse(department, patient, metric string, value floa
 	}]; !ok {
 		return
 	}
+
+	// test
+	m := h.Children[department].Children[patient].Children[metric]
+	h.Children[department].Children[patient].Children[metric] = m
 }

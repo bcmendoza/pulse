@@ -177,6 +177,29 @@
       },
       "required": ["metric", "unitType"]
     },
+    "AddMetricPulse": {
+      "type": "object",
+      "properties": {
+        "department": {
+          "type": "string",
+          "example": "ICU"
+        },
+        "patient": {
+          "type": "string",
+          "example": "patient-39fd6a79-1791-4117-9d14-9a7b2118f930"
+        },
+        "metric": {
+          "type": "string",
+          "example": "Heart Rate"
+        },
+        "value": {
+          "type": "number",
+          "format": "float",
+          "example": 93.26
+        }
+      },
+      "required": ["department", "patient", "metric", "value"]
+    },
     "CreatedResponse": {
       "type": "object",
       "properties": {
@@ -303,10 +326,44 @@
           {
             "name": "AddMetricRequest",
             "in": "body",
-            "description": "Add a metric. To add to de",
+            "description": "Add a metric. To apply to all patients, leave 'patient' and 'department' keys empty. To apply to a department's patients, leave 'patient' empty. Otherwise, to apply to a patient, all fields are required.",
             "required": true,
             "schema": {
               "$ref": "#/definitions/AddMetric"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/CreatedResponse"
+            }
+          },
+          "default": {
+            "description": "Error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/pulses": {
+      "post": {
+        "description": "Adds a metric pulse, updating all listening streams",
+        "tags": ["Departments"],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "operationId": "departments",
+        "parameters": [
+          {
+            "name": "AddMetricPulseRequest",
+            "in": "body",
+            "description": "Add a metric pulse",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AddMetricPulse"
             }
           }
         ],

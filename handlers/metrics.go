@@ -10,7 +10,7 @@ import (
 
 func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if logger, ok := validateMethod("/department", r.Method, "POST", hs.logger, w); ok {
+		if logger, ok := validateMethod("/metrics", r.Method, "POST", hs.logger, w); ok {
 			req, ok := validateRequestFields(r.Body, logger, w)
 			if ok {
 				if req.Metric == "" || req.UnitType == "" {
@@ -63,7 +63,7 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
-				jsonResp := fmt.Sprintf("{\"created\": \"%s\"}", req.Metric)
+				jsonResp := fmt.Sprintf("{\"added\": \"%s\"}", req.Metric)
 				if _, err := w.Write([]byte(jsonResp)); err != nil {
 					logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
 				} else {

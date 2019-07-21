@@ -16,10 +16,11 @@ type handlersState struct {
 }
 
 type RequestBody struct {
-	Department string `json:"department"`
-	Patient    string `json:"patient"`
-	Metric     string `json:"metric"`
-	UnitType   string `json:"unitType"`
+	Department string  `json:"department"`
+	Patient    string  `json:"patient"`
+	Metric     string  `json:"metric"`
+	UnitType   string  `json:"unitType"`
+	Value      float64 `json:"value"`
 }
 
 func Handlers(hospital *model.Hospital, logger zerolog.Logger) http.Handler {
@@ -29,6 +30,7 @@ func Handlers(hospital *model.Hospital, logger zerolog.Logger) http.Handler {
 	r.HandleFunc("/departments", hs.addDepartment())
 	r.HandleFunc("/patients", hs.addPatient())
 	r.HandleFunc("/metrics", hs.addMetric())
+	r.HandleFunc("/pulses", hs.addMetricPulse())
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/app/docs")))
 	return r
 }
