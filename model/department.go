@@ -40,10 +40,12 @@ func (d *Department) Subscribe() {
 				sum += p.Stream.History[s-1].Score
 			}
 		}
-		d.Stream.History = append(
-			d.Stream.History,
-			MakePulse(sum/float64(size), d.Stream.Thresholds),
-		)
-		d.ParentChan <- struct{}{}
+		if size > 0 {
+			d.Stream.History = append(
+				d.Stream.History,
+				MakePulse(sum/float64(size), d.Stream.Thresholds),
+			)
+			d.ParentChan <- struct{}{}
+		}
 	}
 }

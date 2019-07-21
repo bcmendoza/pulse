@@ -35,6 +35,9 @@ func main() {
 
 	hospital := model.New()
 
+	// test
+	hospital.LoadTestSchemas()
+
 	// REST server
 	serverLogger := logger.With().Str("package", "handlers").Logger()
 	server := http.Server{

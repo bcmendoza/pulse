@@ -40,9 +40,11 @@ func (h *Hospital) Subscribe() {
 				sum += d.Stream.History[s-1].Score
 			}
 		}
-		h.Stream.History = append(
-			h.Stream.History,
-			MakePulse(sum/float64(size), h.Stream.Thresholds),
-		)
+		if size > 0 {
+			h.Stream.History = append(
+				h.Stream.History,
+				MakePulse(sum/float64(size), h.Stream.Thresholds),
+			)
+		}
 	}
 }

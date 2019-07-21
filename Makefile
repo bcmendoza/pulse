@@ -17,9 +17,11 @@ vendor:
 #-- Docker
 #------------------------------------------------------------------------------
 
-build:
+build.binary:
 	@echo "Building binary..."
 	@go build --mod=vendor
+
+build: build.binary
 	@echo "Generating docker image..."
 	@docker build -t bcmendoza/pulse:latest .
 
@@ -36,10 +38,22 @@ stop:
 restart: stop build start
 
 #------------------------------------------------------------------------------
+#-- ui
+#------------------------------------------------------------------------------
+
+build.ui:
+	@echo "Fetching and building latest Dashboard..."
+	@cd dashboard && git pull && npm install && rm -rf dist && npm run build
+
+dev.ui:
+	@echo "Running UI dev server..."
+	@cd dashboard && npm run dev
+
+#------------------------------------------------------------------------------
 #-- push
 #------------------------------------------------------------------------------
 
-push:
+push: build.ui
 	@echo "Pushing Docker image..."
-	@heroku container:push web -a pacific-chamber-17670
+	@heroku container:push web -a pulse-sfmc
 	@heroku container:release web

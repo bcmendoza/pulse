@@ -19,7 +19,7 @@ COPY --from=builder /go/src/github.com/bcmendoza/pulse/pulse /app/
 ADD ./docs /app/docs
 
 # Copy over UI
-# COPY --from=builder /go/src/github.com/bcmendoza/pulse/client/build /app/client
+COPY --from=builder /go/src/github.com/bcmendoza/pulse/dashboard/dist /app/client
 
 RUN chown -R 0:0 /app
 RUN chmod -R g=u /app

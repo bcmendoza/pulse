@@ -45,10 +45,12 @@ func (p *Patient) Subscribe() {
 				sum += m.Percent
 			}
 		}
-		p.Stream.History = append(
-			p.Stream.History,
-			MakePulse(sum/float64(size), p.Stream.Thresholds),
-		)
-		p.ParentChan <- struct{}{}
+		if size > 0 {
+			p.Stream.History = append(
+				p.Stream.History,
+				MakePulse(sum/float64(size), p.Stream.Thresholds),
+			)
+			p.ParentChan <- struct{}{}
+		}
 	}
 }
