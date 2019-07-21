@@ -13,17 +13,19 @@ import (
 type handlersState struct {
 	hospital *model.Hospital
 	logger   zerolog.Logger
+	demoChan chan<- struct{}
 }
 
 func Handlers(hospital *model.Hospital, logger zerolog.Logger) http.Handler {
-	hs := handlersState{hospital, logger}
+	hs := handlersState{hospital: hospital, logger: logger}
 	r := mux.NewRouter().StrictSlash(false)
 	r.HandleFunc("/streams", hs.getStreams())
 	r.HandleFunc("/departments", hs.addDepartment())
 	r.HandleFunc("/patients", hs.addPatient())
 	r.HandleFunc("/metrics", hs.addMetric())
 	r.HandleFunc("/pulses", hs.addMetricPulse())
-	r.HandleFunc("/demo", hs.startDemo())
+	r.HandleFunc("/startDemo", hs.startDemo())
+	r.HandleFunc("/stopDemo", hs.stopDemo())
 	// r.PathPrefix("/").Handler(http.FileServer(http.Dir("/app/client")))
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/app/docs")))
 	return r
@@ -55,10 +57,31 @@ func (hs *handlersState) getStreams() func(http.ResponseWriter, *http.Request) {
 
 func (hs *handlersState) startDemo() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		go hs.hospital.RunGenerator()
+		var jsonResp string
+		if hs.DemoChan != nil {
+			demoChan := make(chan struct{}, 1)
+			hs.demoChan = demoChan
+			go hs.hospital.RunGenerator(demoChan)
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "application/json")
+			jsonResp = "{\"started\": \"streaming for 5 minutes\"}"
+		} else {
+			jsonResp = "{\"already running\": \"hold yer horses pal\"}"
+		}
+		if _, err := w.Write([]byte(jsonResp)); err != nil {
+			hs.logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
+		} else {
+			hs.logger.Info().Msg("200 OK")
+		}
+	}
+}
+
+func (hs *handlersState) stopDemo() func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		hs.demoChan <- struct{}{}
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
-		jsonResp := "{\"started\": \"streaming for 5 minutes\"}"
+		jsonResp := "{\"stopped\": \"no longer streaming\"}"
 		if _, err := w.Write([]byte(jsonResp)); err != nil {
 			hs.logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
 		} else {

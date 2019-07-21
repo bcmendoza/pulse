@@ -76,13 +76,12 @@ func (h *Hospital) LoadTestSchemas() {
 	}
 }
 
-func (h *Hospital) RunGenerator() {
-	t, err := time.ParseDuration("5m")
-	if err != nil {
-	}
-	ticker := time.NewTicker(t)
-INFINITE_LOOP:
+func (h *Hospital) RunGenerator(demoChan chan struct{}) {
+DEMO_LOOP:
 	for {
+		for range demoChan {
+			break DEMO_LOOP
+		}
 		for k := range h.MetricKeys {
 			if m, ok := h.Children[k.Department].Children[k.Patient].Children[k.Metric]; ok {
 				h.AddMetricPulse(k.Department, k.Patient, k.Metric, utils.Random(m.Stream.Lower, m.Stream.Upper))
@@ -92,8 +91,5 @@ INFINITE_LOOP:
 		if err != nil {
 		}
 		time.Sleep(d)
-		for range ticker.C {
-			break INFINITE_LOOP
-		}
 	}
 }
