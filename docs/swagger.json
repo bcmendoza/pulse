@@ -13,6 +13,8 @@
       "url": "https://github.com/bcmendoza/pulse/blob/master/LICENSE"
     }
   },
+  "host": "https://pulse-sfmc.herokuapp.com",
+  "schemes": ["https"],
   "definitions": {
     "Stream": {
       "type": "object",
