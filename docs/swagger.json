@@ -297,9 +297,19 @@
                 "unitType": {
                   "type": "string",
                   "example": "BPM"
+                },
+                "lower": {
+                  "type": "number",
+                  "format": "float",
+                  "example": 51.01
+                },
+                "upper": {
+                  "type": "number",
+                  "format": "float",
+                  "example": 120.09
                 }
               },
-              "required": ["metric", "unitType"]
+              "required": ["metric", "unitType", "lower", "upper"]
             }
           }
         ],
