@@ -26,7 +26,7 @@ type RequestBody struct {
 func Handlers(hospital *model.Hospital, logger zerolog.Logger) http.Handler {
 	hs := handlersState{hospital, logger}
 	r := mux.NewRouter()
-	r.HandleFunc("/summary", hs.getSummary())
+	r.HandleFunc("/streams", hs.getStreams())
 	r.HandleFunc("/departments", hs.addDepartment())
 	r.HandleFunc("/patients", hs.addPatient())
 	r.HandleFunc("/metrics", hs.addMetric())
@@ -35,7 +35,7 @@ func Handlers(hospital *model.Hospital, logger zerolog.Logger) http.Handler {
 	return r
 }
 
-func (hs *handlersState) getSummary() func(http.ResponseWriter, *http.Request) {
+func (hs *handlersState) getStreams() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if logger, ok := validateMethod("/summary", r.Method, "GET", hs.logger, w); ok {
 			jsonResp, err := json.Marshal(hs.hospital)

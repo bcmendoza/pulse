@@ -225,15 +225,15 @@
     }
   },
   "paths": {
-    "/summary": {
+    "/streams": {
       "get": {
-        "description": "Gets a summary object of the entire hospital",
-        "tags": ["Summary"],
+        "description": "Gets a streams object of the entire hospital",
+        "tags": ["Streams"],
         "produces": ["application/json"],
-        "operationId": "summary",
+        "operationId": "streams",
         "responses": {
           "200": {
-            "description": "Summary Response",
+            "description": "Streams Response",
             "schema": {
               "$ref": "#/definitions/Hospital"
             }
