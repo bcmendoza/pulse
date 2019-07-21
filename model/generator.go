@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 
 	"github.com/bcmendoza/pulse/utils"
@@ -86,8 +85,12 @@ DEMO_LOOP:
 			if m, ok := h.Children[k.Department].Children[k.Patient].Children[k.Metric]; ok {
 				h.AddMetricPulse(k.Department, k.Patient, k.Metric, utils.Random(m.Stream.Lower, m.Stream.Upper))
 			}
+			d, err := time.ParseDuration(fmt.Sprintf("%ds", 2))
+			time.Sleep(d)
+			if err != nil {
+			}
 		}
-		d, err := time.ParseDuration(fmt.Sprintf("%ds", rand.Intn(5)))
+		d, err := time.ParseDuration(fmt.Sprintf("%ds", 5))
 		if err != nil {
 		}
 		time.Sleep(d)

@@ -26,8 +26,8 @@ func Handlers(hospital *model.Hospital, logger zerolog.Logger) http.Handler {
 	r.HandleFunc("/pulses", hs.addMetricPulse())
 	r.HandleFunc("/startDemo", hs.startDemo())
 	r.HandleFunc("/stopDemo", hs.stopDemo())
-	// r.PathPrefix("/").Handler(http.FileServer(http.Dir("/app/client")))
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/app/docs")))
+	// r.HandleFunc("/doc").Handler(http.FileServer(http.Dir("/app/docs")))
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/app/client")))
 	return r
 }
 
@@ -58,7 +58,7 @@ func (hs *handlersState) getStreams() func(http.ResponseWriter, *http.Request) {
 func (hs *handlersState) startDemo() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var jsonResp string
-		if hs.DemoChan != nil {
+		if hs.demoChan != nil {
 			demoChan := make(chan struct{}, 1)
 			hs.demoChan = demoChan
 			go hs.hospital.RunGenerator(demoChan)
