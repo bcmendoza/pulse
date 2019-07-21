@@ -58,7 +58,7 @@ func (hs *handlersState) getStreams() func(http.ResponseWriter, *http.Request) {
 func (hs *handlersState) startDemo() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var jsonResp string
-		if hs.demoChan != nil {
+		if hs.demoChan == nil {
 			demoChan := make(chan struct{}, 1)
 			hs.demoChan = demoChan
 			go hs.hospital.RunGenerator(demoChan)
