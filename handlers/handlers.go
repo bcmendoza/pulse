@@ -55,7 +55,7 @@ func (hs *handlersState) getStreams() func(http.ResponseWriter, *http.Request) {
 
 func (hs *handlersState) startDemo() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		hs.hospital.RunGenerator()
+		go hs.hospital.RunGenerator()
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 		jsonResp := "{\"started\": \"streaming for 5 minutes\"}"
