@@ -63,7 +63,7 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
-				jsonResp := fmt.Sprintf("{\"added\": \"%s\"}", req.Metric)
+				jsonResp := fmt.Sprintf("{\"added\": \"metric-%s\"}", req.Metric)
 				if _, err := w.Write([]byte(jsonResp)); err != nil {
 					logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
 				} else {

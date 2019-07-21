@@ -22,7 +22,7 @@ func (hs *handlersState) addMetricPulse() func(http.ResponseWriter, *http.Reques
 				hs.hospital.AddMetricPulse(req.Department, req.Patient, req.Metric, req.Value)
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
-				jsonResp := fmt.Sprintf("{\"added\": \"%s\"}", req.Metric)
+				jsonResp := fmt.Sprintf("{\"added\": %f}", req.Value)
 				if _, err := w.Write([]byte(jsonResp)); err != nil {
 					logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
 				} else {

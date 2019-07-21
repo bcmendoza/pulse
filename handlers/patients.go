@@ -45,7 +45,7 @@ func (hs *handlersState) addPatient() func(http.ResponseWriter, *http.Request) {
 				hs.hospital.AddPatient(req.Department, utils.UUID())
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
-				jsonResp := fmt.Sprintf("{\"added\": \"%s\"}", uuid)
+				jsonResp := fmt.Sprintf("{\"added\": \"patient-%s\"}", uuid)
 				if _, err := w.Write([]byte(jsonResp)); err != nil {
 					logger.Error().AnErr("w.Write", err).Msg("500 Internal server error")
 				} else {
