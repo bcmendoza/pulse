@@ -69,12 +69,8 @@ func (h *Hospital) LoadTestSchemas() {
 	}
 }
 
-func (h *Hospital) RunGenerator(demoChan chan struct{}) {
-DEMO_LOOP:
+func (h *Hospital) RunGenerator() {
 	for {
-		for range demoChan {
-			break DEMO_LOOP
-		}
 		for k := range h.MetricKeys {
 			if m, ok := h.Children[k.Department].Children[k.Patient].Children[k.Metric]; ok {
 				h.AddMetricPulse(k.Department, k.Patient, k.Metric, utils.Random(m.Stream.Lower, m.Stream.Upper))
