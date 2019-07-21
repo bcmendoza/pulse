@@ -15,16 +15,6 @@ type handlersState struct {
 	logger   zerolog.Logger
 }
 
-type RequestBody struct {
-	Department string  `json:"department"`
-	Patient    string  `json:"patient"`
-	Metric     string  `json:"metric"`
-	UnitType   string  `json:"unitType"`
-	Lower      float64 `json:"lower"`
-	Upper      float64 `json:"upper"`
-	Value      float64 `json:"value"`
-}
-
 func Handlers(hospital *model.Hospital, logger zerolog.Logger) http.Handler {
 	hs := handlersState{hospital, logger}
 	r := mux.NewRouter()
