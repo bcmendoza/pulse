@@ -70,19 +70,25 @@ func (h *Hospital) LoadTestSchemas() {
 }
 
 func (h *Hospital) RunGenerator() {
-	for {
-		for k := range h.MetricKeys {
-			if m, ok := h.Children[k.Department].Children[k.Patient].Children[k.Metric]; ok {
-				h.AddMetricPulse(k.Department, k.Patient, k.Metric, utils.Random(m.Stream.Lower, m.Stream.Upper))
+TIMED_LOOP:
+	for timeout := time.After(time.Minute * 5); ; {
+		select {
+		case <-timeout:
+			break TIMED_LOOP
+		default:
+			for k := range h.MetricKeys {
+				if m, ok := h.Children[k.Department].Children[k.Patient].Children[k.Metric]; ok {
+					h.AddMetricPulse(k.Department, k.Patient, k.Metric, utils.Random(m.Stream.Lower, m.Stream.Upper))
+				}
+				d, err := time.ParseDuration(fmt.Sprintf("%ds", 2))
+				time.Sleep(d)
+				if err != nil {
+				}
 			}
-			d, err := time.ParseDuration(fmt.Sprintf("%ds", 2))
-			time.Sleep(d)
+			d, err := time.ParseDuration(fmt.Sprintf("%ds", 5))
 			if err != nil {
 			}
+			time.Sleep(d)
 		}
-		d, err := time.ParseDuration(fmt.Sprintf("%ds", 5))
-		if err != nil {
-		}
-		time.Sleep(d)
 	}
 }
