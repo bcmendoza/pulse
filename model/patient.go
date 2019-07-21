@@ -12,6 +12,11 @@ type Patient struct {
 	Stream   Stream            `json:"stream"`
 }
 
+type PatientKey struct {
+	Department string
+	Patient    string
+}
+
 func (h *Hospital) AddPatient(department, patient string) {
 	h.Lock()
 	defer h.Unlock()

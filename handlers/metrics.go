@@ -33,18 +33,32 @@ func (hs *handlersState) addMetric() func(http.ResponseWriter, *http.Request) {
 					}, w)
 				}
 
+				success := false
 				if req.Patient == "" && req.Department == "" {
 					hs.hospital.AddHospitalMetrics(req.Metric, req.UnitType)
+					success = true
 				} else if req.Patient == "" && req.Department != "" {
-					hs.hospital.AddDepartmentMetrics(req.Department, req.Metric, req.UnitType)
+					if _, ok := hs.hospital.Children[req.Department]; ok {
+						hs.hospital.AddDepartmentMetrics(req.Department, req.Metric, req.UnitType)
+						success = true
+					}
 				} else if req.Patient != "" && req.Department != "" {
-					hs.hospital.AddPatientMetric(req.Department, req.Patient, req.Metric, req.UnitType)
-				} else {
-					logger.Error().AnErr("addMetric()", errors.New("missing field(s)")).Msg("400 Bad Request")
+					if _, ok := hs.hospital.PatientKeys[model.PatientKey{
+						Department: req.Department,
+						Patient:    req.Patient,
+					}]; ok {
+						hs.hospital.AddPatientMetric(req.Department, req.Patient, req.Metric, req.UnitType)
+						success = true
+					}
+				}
+
+				if success == false {
+					logger.Error().AnErr("addMetric()", errors.New("invalid field(s)")).Msg("400 Bad Request")
 					Report(ProblemDetail{
 						StatusCode: http.StatusBadRequest,
-						Detail:     "Patient specified but no department in metric creation",
+						Detail:     "Unable to add",
 					}, w)
+					return
 				}
 
 				w.WriteHeader(http.StatusOK)

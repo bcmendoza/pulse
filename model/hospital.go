@@ -22,17 +22,6 @@ type Hospital struct {
 	MetricKeys  map[MetricKey]struct{}  `json:"-"`
 }
 
-type PatientKey struct {
-	Department string
-	Patient    string
-}
-
-type MetricKey struct {
-	Department string
-	Patient    string
-	Metric     string
-}
-
 func New() *Hospital {
 	return &Hospital{
 		Name:     "hospital",
