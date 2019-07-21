@@ -33,34 +33,28 @@ var allMetrics = []TestData{
 		Lower:    0.01,
 		Upper:    1.0,
 	},
+	TestData{
+		Label:    "Total Patients Admitted",
+		UnitType: "patients",
+		Lower:    100,
+		Upper:    5000,
+	},
+	TestData{
+		Label:    "Average Length of Stay",
+		UnitType: "day",
+		Lower:    1,
+		Upper:    8,
+	},
 }
 
 var deptMetrics = map[string][]TestData{
-	"Critical Care: SICU": []TestData{
-		TestData{},
-		TestData{},
-		TestData{},
-	},
-	"Maternal & Fetal Medicine": []TestData{
-		TestData{},
-		TestData{},
-		TestData{},
-	},
-	"Level III NICU": []TestData{
-		TestData{},
-		TestData{},
-		TestData{},
-	},
-	"Radiation Oncology": []TestData{
-		TestData{},
-		TestData{},
-		TestData{},
-	},
-	"Cardiology Group": []TestData{
-		TestData{},
-		TestData{},
-		TestData{},
-	},
+	"Critical Care: SICU":       []TestData{},
+	"Maternal & Fetal Medicine": []TestData{},
+	"Neuro/Medical":             []TestData{},
+	"Radiation Oncology":        []TestData{},
+	"Ortho/Surgical":            []TestData{},
+	"Rehab":                     []TestData{},
+	"PCU":                       []TestData{},
 }
 
 func (h *Hospital) LoadTestSchemas() {
